@@ -1,0 +1,33 @@
+# Datos nuevos periódicos: CronJob cada minuto (granularidad mínima de cron en K8s).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: solarbi-simulador
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid             # nunca dos emisiones simultáneas del mismo minuto
+  startingDeadlineSeconds: 50
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 55
+      template:
+        metadata:
+          labels: {app: solarbi-simulador}
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: simulador
+              image: solarbi-simulator:1.0.0
+              imagePullPolicy: IfNotPresent
+              envFrom: [{configMapRef: {name: solarbi-config}}]   # ANOMALIA_PROB, FORZAR_ANOMALIA...
+              env:
+                - {name: PGHOST,     valueFrom: {configMapKeyRef: {name: solarbi-config, key: SOLARBI_PG_HOST}}}
+                - {name: PGDATABASE, valueFrom: {configMapKeyRef: {name: solarbi-config, key: SOLARBI_PG_DB}}}
+                - {name: PGUSER,     valueFrom: {configMapKeyRef: {name: solarbi-config, key: SOLARBI_ETL_USER}}}
+                - {name: PGPASSWORD, valueFrom: {secretKeyRef: {name: solarbi-secret, key: SOLARBI_ETL_PASSWORD}}}
+              resources:
+                requests: {cpu: 50m,  memory: 128Mi}
+                limits:   {cpu: 300m, memory: 256Mi}

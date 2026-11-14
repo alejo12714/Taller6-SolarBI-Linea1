@@ -1,0 +1,20 @@
+# Fuente de datos aprovisionada: Grafana la crea al arrancar (sin clics).
+# ${VAR} se expande con variables de entorno del contenedor (Secret / ConfigMap).
+apiVersion: 1
+datasources:
+  - name: SolarBI-PostgreSQL
+    uid: solarbi-pg
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: ${SOLARBI_PG_HOST}:5432          # "postgres" = nombre DNS del Service, no IP
+    user: ${SOLARBI_PG_READER_USER}        # rol de solo lectura (bi_reader)
+    isDefault: true
+    editable: false
+    jsonData:
+      database: ${SOLARBI_PG_DB}
+      sslmode: disable                     # tráfico interno al namespace; ver informe §J
+      postgresVersion: 1600
+      maxOpenConns: 5
+      timeInterval: 1m                     # grano mínimo = grano de Silver/Gold
+    secureJsonData:
+      password: ${SOLARBI_PG_READER_PASSWORD}

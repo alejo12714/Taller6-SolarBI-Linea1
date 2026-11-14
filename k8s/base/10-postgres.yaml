@@ -1,0 +1,72 @@
+# PostgreSQL: StatefulSet (identidad estable postgres-0 + PVC propio que sobrevive al pod).
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres                       # DNS interno: postgres.solarbi.svc.cluster.local
+  labels: {app: postgres}
+spec:
+  clusterIP: None                      # headless: gobierna la identidad del StatefulSet
+  selector: {app: postgres}
+  ports: [{name: pg, port: 5432, targetPort: pg}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-externo               # DBeaver y Power BI desde el anfitrión
+  labels: {app: postgres}
+spec:
+  type: NodePort
+  selector: {app: postgres}
+  ports: [{name: pg, port: 5432, targetPort: pg, nodePort: 30432}]   # k3d: -p 5432:30432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  replicas: 1                          # ver informe: no se escala como Grafana (escritor único)
+  selector:
+    matchLabels: {app: postgres}
+  template:
+    metadata:
+      labels: {app: postgres}
+    spec:
+      securityContext:
+        fsGroup: 999                   # usuario postgres de la imagen oficial
+      containers:
+        - name: postgres
+          image: postgres:16.4-bookworm      # versión fija, nunca :latest
+          ports: [{name: pg, containerPort: 5432}]
+          env:
+            - {name: POSTGRES_USER, value: postgres}
+            - {name: POSTGRES_DB, valueFrom: {configMapKeyRef: {name: solarbi-config, key: SOLARBI_PG_DB}}}
+            - {name: PGDATA, value: /var/lib/postgresql/data/pgdata}   # subdirectorio: evita lost+found
+          envFrom:
+            - configMapRef: {name: solarbi-config}
+            - secretRef: {name: solarbi-secret}
+          volumeMounts:
+            - {name: datos, mountPath: /var/lib/postgresql/data}
+            - {name: init, mountPath: /docker-entrypoint-initdb.d, readOnly: true}
+          readinessProbe:                    # ¿acepta conexiones? -> entra al Service
+            exec: {command: ["sh", "-c", "pg_isready -U postgres -d \"$POSTGRES_DB\" -h 127.0.0.1"]}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:                     # ¿proceso colgado? -> reinicio
+            exec: {command: ["sh", "-c", "pg_isready -U postgres -h 127.0.0.1"]}
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 4
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits:   {cpu: "1",  memory: 1536Mi}
+      volumes:
+        - name: init
+          configMap: {name: postgres-init, defaultMode: 0555}
+  volumeClaimTemplates:
+    - metadata: {name: datos}
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path         # aprovisionador incluido en k3s/k3d
+        resources:
+          requests: {storage: 5Gi}           # Gold+Silver ≈ 1 GB con índices; holgura para el simulador

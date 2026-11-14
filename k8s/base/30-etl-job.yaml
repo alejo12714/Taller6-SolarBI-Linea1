@@ -1,0 +1,39 @@
+# Carga histórica: Job (corre una vez, termina, conserva pod y log como evidencia).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: solarbi-etl
+spec:
+  backoffLimit: 2                       # el ETL es transaccional e idempotente: reintentar es seguro
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels: {app: solarbi-etl}
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: espera-postgres          # no arranca hasta que el Service resuelva y acepte conexiones
+          image: postgres:16.4-bookworm
+          command: ["sh", "-c", "until pg_isready -h \"$SOLARBI_PG_HOST\" -p 5432; do echo esperando postgres; sleep 3; done"]
+          envFrom: [{configMapRef: {name: solarbi-config}}]
+          resources:
+            requests: {cpu: 10m, memory: 16Mi}
+            limits:   {cpu: 100m, memory: 64Mi}
+      containers:
+        - name: etl
+          image: solarbi-etl:1.0.0
+          imagePullPolicy: IfNotPresent  # imagen importada con `k3d image import` (sin registry)
+          envFrom: [{configMapRef: {name: solarbi-config}}]
+          env:
+            - {name: PGHOST,     valueFrom: {configMapKeyRef: {name: solarbi-config, key: SOLARBI_PG_HOST}}}
+            - {name: PGDATABASE, valueFrom: {configMapKeyRef: {name: solarbi-config, key: SOLARBI_PG_DB}}}
+            - {name: PGUSER,     valueFrom: {configMapKeyRef: {name: solarbi-config, key: SOLARBI_ETL_USER}}}
+            - {name: PGPASSWORD, valueFrom: {secretKeyRef: {name: solarbi-secret, key: SOLARBI_ETL_PASSWORD}}}
+          volumeMounts:
+            - {name: bronze, mountPath: /data, readOnly: true}   # Bronze montado en solo lectura
+          resources:
+            requests: {cpu: 500m, memory: 1Gi}
+            limits:   {cpu: "2",  memory: 3Gi}
+      volumes:
+        - name: bronze
+          hostPath: {path: /data, type: Directory}   # k3d --volume ./data:/data@server:0

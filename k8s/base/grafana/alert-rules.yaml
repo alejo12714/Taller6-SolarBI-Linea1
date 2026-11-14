@@ -1,0 +1,146 @@
+# Reglas de alerta como código. Umbrales inyectados desde el ConfigMap solarbi-config:
+# cambiar el umbral = kubectl edit cm + rollout restart; NO se reconstruye la imagen.
+apiVersion: 1
+groups:
+- orgId: 1
+  name: solarbi-operativo
+  folder: SolarBI
+  interval: 1m
+  rules:
+  - uid: solarbi-soc-bajo
+    title: Batería con SoC bajo
+    condition: C
+    for: 2m
+    noDataState: OK
+    execErrState: Error
+    labels:
+      severidad: critica
+      proyecto: solarbi
+    annotations:
+      summary: SoC mínimo de {{ $$labels.inversor }} = {{ $$values.B }} %
+      description: Por debajo del umbral ALERTA_SOC_MIN (ConfigMap). Riesgo de corte por batstopsoc.
+      __dashboardUid__: solarbi-operativo
+    data:
+    - refId: A
+      datasourceUid: solarbi-pg
+      relativeTimeRange:
+        from: 900
+        to: 0
+      model:
+        refId: A
+        rawSql: SELECT 'inv' || i.inversor_id AS inversor, min(f.soc_min_pct)::float AS valor FROM gold.fact_telemetria_minuto f JOIN gold.dim_inversor i USING (sk_inversor) WHERE f.ts_minuto_utc > now()
+          - interval '5 minutes' AND f.soc_min_pct IS NOT NULL GROUP BY 1
+        format: table
+        rawQuery: true
+        editorMode: code
+    - refId: B
+      datasourceUid: __expr__
+      model:
+        refId: B
+        type: reduce
+        expression: A
+        reducer: last
+        settings:
+          mode: dropNN
+    - refId: C
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: B
+        conditions:
+        - evaluator:
+            type: lt
+            params:
+            - ${ALERTA_SOC_MIN}
+  - uid: solarbi-frescura
+    title: Telemetría detenida (sin datos recientes)
+    condition: C
+    for: 1m
+    noDataState: Alerting
+    execErrState: Error
+    labels:
+      severidad: advertencia
+      proyecto: solarbi
+    annotations:
+      summary: '{{ $$labels.inversor }} lleva {{ $$values.B }} s sin lecturas'
+      description: Umbral ≈ 2,7 × p99 de cadencia (111 s); por debajo del umbral de hueco de los autores (600 s).
+      __dashboardUid__: solarbi-operativo
+    data:
+    - refId: A
+      datasourceUid: solarbi-pg
+      relativeTimeRange:
+        from: 900
+        to: 0
+      model:
+        refId: A
+        rawSql: SELECT 'inv' || inversor_id AS inversor, segundos_desde_ultimo::float AS valor FROM gold.vw_estado_actual
+        format: table
+        rawQuery: true
+        editorMode: code
+    - refId: B
+      datasourceUid: __expr__
+      model:
+        refId: B
+        type: reduce
+        expression: A
+        reducer: last
+        settings:
+          mode: dropNN
+    - refId: C
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: B
+        conditions:
+        - evaluator:
+            type: gt
+            params:
+            - ${ALERTA_FRESCURA_S}
+  - uid: solarbi-calidad
+    title: Calidad de telemetría degradada (Línea 1)
+    condition: C
+    for: 3m
+    noDataState: OK
+    execErrState: Error
+    labels:
+      severidad: advertencia
+      proyecto: solarbi
+    annotations:
+      summary: '% de lecturas válidas de {{ $$labels.inversor }} = {{ $$values.B }} %'
+      description: Línea base histórica ≈ 98 % (1,94 % de tramas nulas). 90 % ≈ 5 × la tasa normal de inválidos.
+      __dashboardUid__: solarbi-operativo
+    data:
+    - refId: A
+      datasourceUid: solarbi-pg
+      relativeTimeRange:
+        from: 900
+        to: 0
+      model:
+        refId: A
+        rawSql: SELECT 'inv' || i.inversor_id AS inversor, 100.0 * sum(f.n_validas) / NULLIF(sum(f.n_lecturas), 0) AS valor FROM gold.fact_telemetria_minuto f JOIN gold.dim_inversor i USING (sk_inversor)
+          WHERE f.ts_minuto_utc > now() - interval '15 minutes' GROUP BY 1
+        format: table
+        rawQuery: true
+        editorMode: code
+    - refId: B
+      datasourceUid: __expr__
+      model:
+        refId: B
+        type: reduce
+        expression: A
+        reducer: last
+        settings:
+          mode: dropNN
+    - refId: C
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: B
+        conditions:
+        - evaluator:
+            type: lt
+            params:
+            - ${ALERTA_PCT_VALIDAS}

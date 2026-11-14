@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: solarbi
+    folder: SolarBI
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false        # el tablero vive en Git; cambios por la UI no persisten
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
