@@ -1,0 +1,163 @@
+table dim_fecha
+	lineageTag: 6dd4bd26-1048-4ab9-8d4e-f004dcff0152
+	dataCategory: Time
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b447f16d-596a-4597-aa0a-e6bd95083ce1
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: ec2320df-c8b5-4359-8210-d6c585d9651a
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column anio
+		dataType: int64
+		formatString: 0
+		lineageTag: 4e72c804-d5d0-45d2-b66a-e414de859822
+		summarizeBy: sum
+		sourceColumn: anio
+
+		annotation SummarizationSetBy = Automatic
+
+	column semestre
+		dataType: int64
+		formatString: 0
+		lineageTag: adf20f3b-cde1-4a25-bce5-66212f500dd0
+		summarizeBy: sum
+		sourceColumn: semestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column trimestre
+		dataType: int64
+		formatString: 0
+		lineageTag: 8252cc3d-4607-4ebc-832c-3488f01c734c
+		summarizeBy: sum
+		sourceColumn: trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes
+		dataType: int64
+		formatString: 0
+		lineageTag: fd892c6e-ae84-4320-bc2f-e5a2a5cd709e
+		summarizeBy: sum
+		sourceColumn: mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_mes
+		dataType: string
+		lineageTag: a000c940-178f-4c00-b742-4beaf7d78e63
+		summarizeBy: none
+		sourceColumn: nombre_mes
+		sortByColumn: mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column anio_mes
+		dataType: string
+		lineageTag: cf1e7a9f-5b50-4338-8b1e-542a761b31ed
+		summarizeBy: none
+		sourceColumn: anio_mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column semana_iso
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ee514d9-dd2a-4deb-844c-5e8257f3d80f
+		summarizeBy: sum
+		sourceColumn: semana_iso
+
+		annotation SummarizationSetBy = Automatic
+
+	column dia_mes
+		dataType: int64
+		formatString: 0
+		lineageTag: d8bdbf39-40f7-44d3-b8c3-e1f0d784baea
+		summarizeBy: sum
+		sourceColumn: dia_mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column dia_semana_iso
+		dataType: int64
+		formatString: 0
+		lineageTag: c5c383ed-dc58-438f-88d5-f814c198abde
+		summarizeBy: sum
+		sourceColumn: dia_semana_iso
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_dia
+		dataType: string
+		lineageTag: 03bbfbf6-ef6a-4fce-953e-c0dd3345d890
+		summarizeBy: none
+		sourceColumn: nombre_dia
+		sortByColumn: dia_semana_iso
+
+		annotation SummarizationSetBy = Automatic
+
+	column es_fin_semana
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 084d1223-f8d6-4284-9a94-ce9c86f05679
+		summarizeBy: none
+		sourceColumn: es_fin_semana
+
+		annotation SummarizationSetBy = Automatic
+
+	column estacion
+		dataType: string
+		lineageTag: f5cbec25-72d8-47f1-aa0a-daa694170c0b
+		summarizeBy: none
+		sourceColumn: estacion
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Jerarquía fecha'
+		lineageTag: f3081ba5-b305-5c4a-9baa-5fc498e0939e
+
+		level anio
+			lineageTag: 584a8b3a-a109-54e7-9c1e-d7fe6346305f
+			column: anio
+
+		level trimestre
+			lineageTag: 2b916e3a-46f3-5c11-b26f-4d731b7315c6
+			column: trimestre
+
+		level mes
+			lineageTag: 2e8faedc-07b6-5b09-9292-d9f63295a231
+			column: mes
+
+		level fecha
+			lineageTag: 539f4cd0-d0e4-5f96-8149-e663931ced85
+			column: fecha
+
+	partition dim_fecha = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="dim_fecha"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_fecha", "fecha", "anio", "semestre", "trimestre", "mes", "nombre_mes", "anio_mes", "semana_iso", "dia_mes", "dia_semana_iso", "nombre_dia", "es_fin_semana", "estacion"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

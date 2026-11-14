@@ -1,0 +1,93 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "l3",
+  "position": {
+    "x": 320,
+    "y": 230,
+    "z": 36,
+    "height": 400,
+    "width": 1580,
+    "tabOrder": 36
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_fecha"
+                    }
+                  },
+                  "Property": "anio_mes"
+                }
+              },
+              "queryRef": "dim_fecha.anio_mes",
+              "nativeQueryRef": "anio_mes",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Costo red COP"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Costo red COP",
+              "nativeQueryRef": "Costo red COP"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Ahorro autosuficiencia COP"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Ahorro autosuficiencia COP",
+              "nativeQueryRef": "Ahorro autosuficiencia COP"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Costo de red vs ahorro por mes'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

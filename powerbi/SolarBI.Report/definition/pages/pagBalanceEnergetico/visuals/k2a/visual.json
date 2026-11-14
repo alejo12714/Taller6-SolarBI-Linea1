@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "k2a",
+  "position": {
+    "x": 320,
+    "y": 80,
+    "z": 17,
+    "height": 130,
+    "width": 280,
+    "tabOrder": 17
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "E PV kWh"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.E PV kWh",
+              "nativeQueryRef": "E PV kWh"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Energía solar (kWh)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

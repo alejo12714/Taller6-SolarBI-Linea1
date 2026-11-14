@@ -1,0 +1,19 @@
+table ServidorPG
+	isHidden
+	lineageTag: de6afc22-83c3-41d4-a832-6f423c3cee4b
+
+	column ServidorPG
+		dataType: string
+		isHidden
+		lineageTag: ce8ca553-1a25-4c06-aba0-c91df769c06d
+		summarizeBy: none
+		sourceColumn: ServidorPG
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ServidorPG = m
+		mode: import
+		source = "localhost:5433" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+	annotation PBI_ResultType = Text
+

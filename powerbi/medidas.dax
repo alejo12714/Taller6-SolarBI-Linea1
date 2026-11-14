@@ -1,0 +1,96 @@
+// =====================================================================
+// SolarBI · Modelo semántico Power BI (formato PBIP/TMDL versionado en Git)
+// Conexión: PostgreSQL localhost:5432 (NodePort 30432 vía k3d) · usuario solarbi_reader · Importación
+// Tablas: gold.dim_fecha (marcada como tabla de fechas), dim_tiempo, dim_inversor, dim_regla_calidad,
+//         dim_tipo_evento, fact_telemetria_minuto (origen='historico'), fact_calidad_diaria,
+//         fact_disponibilidad_diaria, fact_conciliacion_diaria, fact_evento_operativo
+// Relaciones 1:* de una sola dirección: dim_* -> fact_* por sk_fecha, sk_tiempo, sk_inversor, sk_regla
+// =====================================================================
+
+// ---------------------------------------------------------------- Energía
+E PV kWh            = SUM ( fact_telemetria_minuto[e_pv_kwh] )
+E Carga kWh         = SUM ( fact_telemetria_minuto[e_carga_kwh] )
+E Red kWh           = SUM ( fact_telemetria_minuto[e_red_kwh] )
+E Bat Carga kWh     = SUM ( fact_telemetria_minuto[e_bat_carga_kwh] )
+E Bat Descarga kWh  = SUM ( fact_telemetria_minuto[e_bat_descarga_kwh] )
+
+// Indicadores propios de un sistema híbrido
+// La red también carga la batería (sep–nov 2025, abr–may 2026): solo cuenta la red que cubre la carga.
+Autosuficiencia %   = DIVIDE ( [E Carga kWh] - MIN ( [E Red kWh], [E Carga kWh] ), [E Carga kWh] )
+Red excedente kWh   = MAX ( 0, [E Red kWh] - [E Carga kWh] )   // red que no fue a la carga (≈ carga de batería)
+Cobertura solar %   = DIVIDE ( [E PV kWh], [E Carga kWh] )
+Eficiencia aparente batería % = DIVIDE ( [E Bat Descarga kWh], [E Bat Carga kWh] )
+
+// Cierre del balance: entradas − salidas. Pérdidas de conversión + canales no medidos.
+// Negativo = inconsistencia de medición (también es un indicador de calidad).
+Balance no explicado kWh =
+    ( [E PV kWh] + [E Red kWh] + [E Bat Descarga kWh] ) - ( [E Carga kWh] + [E Bat Carga kWh] )
+Cierre del balance % = DIVIDE ( [Balance no explicado kWh], [E PV kWh] + [E Red kWh] + [E Bat Descarga kWh] )
+
+// Ciclos equivalentes: descarga / capacidad nominal. V nominal = parámetro (supuesto 48 V-clase,
+// la fuente da 21,8–57,6 V y battpackrateah, no kWh).
+V nominal batería   = SELECTEDVALUE ( 'Parámetro V nominal'[V nominal], 51.2 )
+Capacidad bat kWh   = SUMX ( VALUES ( dim_inversor[inversor_id] ),
+                        CALCULATE ( MAX ( dim_inversor[capacidad_bat_ah] ) ) ) * [V nominal batería] / 1000
+Ciclos equivalentes = DIVIDE ( [E Bat Descarga kWh], [Capacidad bat kWh] )
+
+Dependencia nocturna de red % =
+    DIVIDE ( CALCULATE ( [E Red kWh], dim_tiempo[es_ventana_solar] = FALSE () ), [E Red kWh] )
+
+// ---------------------------------------------------------------- Línea 1 · Calidad del dato
+Lecturas recibidas  = SUM ( fact_disponibilidad_diaria[lecturas_recibidas] )
+Lecturas válidas    = SUM ( fact_disponibilidad_diaria[lecturas_validas] )
+% Lecturas válidas  = DIVIDE ( [Lecturas válidas], [Lecturas recibidas] )
+
+// Disponibilidad con denominador CALENDARIO: los días sin ninguna lectura (hueco máx. 26,1 días)
+// no existen en el hecho; promediar solo las filas presentes sobrestimaría la disponibilidad.
+Días en ventana de registro =
+    COUNTROWS ( FILTER ( dim_fecha,
+        dim_fecha[fecha] >= DATE ( 2025, 7, 12 ) && dim_fecha[fecha] <= DATE ( 2026, 7, 13 ) ) )
+Inversores en contexto =
+    COUNTROWS ( FILTER ( VALUES ( dim_inversor[inversor_id] ), dim_inversor[inversor_id] > 0 ) )
+Disponibilidad registro % =
+    DIVIDE ( SUM ( fact_disponibilidad_diaria[seg_cubiertos_valid] ),
+             [Días en ventana de registro] * 86400 * [Inversores en contexto] )
+Huecos > 10 min     = SUM ( fact_disponibilidad_diaria[huecos_mayor_10min] )
+
+Tasa violación regla % =
+    DIVIDE ( SUM ( fact_calidad_diaria[lecturas_afectadas] ), SUM ( fact_calidad_diaria[lecturas_evaluadas] ) )
+Lecturas invalidadas = CALCULATE ( SUM ( fact_calidad_diaria[lecturas_afectadas] ), dim_regla_calidad[severidad] = 3 )
+
+Desviación conciliación PV % =
+    VAR dias = FILTER ( fact_conciliacion_diaria, NOT ISBLANK ( fact_conciliacion_diaria[pv_kwh_contador] ) )
+    RETURN DIVIDE ( SUMX ( dias, fact_conciliacion_diaria[pv_kwh_integrado] - fact_conciliacion_diaria[pv_kwh_contador] ),
+                    SUMX ( dias, fact_conciliacion_diaria[pv_kwh_contador] ) )
+Días que concilian % =
+    DIVIDE ( COUNTROWS ( FILTER ( fact_conciliacion_diaria, ABS ( fact_conciliacion_diaria[desv_pv_pct] ) <= 20 ) ),
+             COUNTROWS ( FILTER ( fact_conciliacion_diaria, NOT ISBLANK ( fact_conciliacion_diaria[desv_pv_pct] ) ) ) )
+
+// ---------------------------------------------------------------- Inteligencia de tiempo
+E PV MTD            = TOTALMTD ( [E PV kWh], dim_fecha[fecha] )
+E PV YTD            = TOTALYTD ( [E PV kWh], dim_fecha[fecha] )
+E PV mes anterior   = CALCULATE ( [E PV kWh], DATEADD ( dim_fecha[fecha], -1, MONTH ) )
+Var PV MoM %        = DIVIDE ( [E PV kWh] - [E PV mes anterior], [E PV mes anterior] )
+Autosuficiencia mes anterior % = CALCULATE ( [Autosuficiencia %], DATEADD ( dim_fecha[fecha], -1, MONTH ) )
+% Válidas MM7 =
+    AVERAGEX ( DATESINPERIOD ( dim_fecha[fecha], MAX ( dim_fecha[fecha] ), -7, DAY ), [% Lecturas válidas] )
+// YoY solo es válido para el 12–13 de julio (la serie cubre un año); por eso se privilegia MoM.
+
+// ---------------------------------------------------------------- What-if
+// Modelado > Nuevo parámetro > Intervalo numérico (crea la tabla y la segmentación):
+//   Tarifa         = GENERATESERIES ( 600, 1500, 20 )       valor por defecto 920
+//   Factor PV      = GENERATESERIES ( 1, 2, 0.1 )           1,0 = arreglo actual; 1,5 = +50 % de paneles
+Valor Tarifa        = SELECTEDVALUE ( Tarifa[Tarifa], 920 )
+Valor Factor PV     = SELECTEDVALUE ( 'Factor PV'[Factor PV], 1 )
+
+Costo red COP       = [E Red kWh] * [Valor Tarifa]
+Ahorro autosuficiencia COP = ( [E Carga kWh] - MIN ( [E Red kWh], [E Carga kWh] ) ) * [Valor Tarifa]
+Ahorro YTD COP      = TOTALYTD ( [Ahorro autosuficiencia COP], dim_fecha[fecha] )
+
+// Escenario de capacidad: la PV adicional desplaza red SOLO en el mismo minuto (cota inferior:
+// ignora que la batería podría almacenar el excedente para la noche).
+E Red escenario kWh =
+    VAR f = [Valor Factor PV]          // fuera del iterador: evita transición de contexto por fila
+    RETURN SUMX ( fact_telemetria_minuto,
+        MAX ( 0, fact_telemetria_minuto[e_red_kwh] - ( f - 1 ) * fact_telemetria_minuto[e_pv_kwh] ) )
+Ahorro adicional escenario COP = ( [E Red kWh] - [E Red escenario kWh] ) * [Valor Tarifa]

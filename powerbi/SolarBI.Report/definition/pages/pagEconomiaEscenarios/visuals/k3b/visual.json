@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "k3b",
+  "position": {
+    "x": 610,
+    "y": 80,
+    "z": 32,
+    "height": 130,
+    "width": 280,
+    "tabOrder": 32
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Ahorro autosuficiencia COP"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Ahorro autosuficiencia COP",
+              "nativeQueryRef": "Ahorro autosuficiencia COP"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ahorro por autosuficiencia'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

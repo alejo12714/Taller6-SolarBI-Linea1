@@ -1,0 +1,93 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "l2",
+  "position": {
+    "x": 1200,
+    "y": 670,
+    "z": 25,
+    "height": 390,
+    "width": 700,
+    "tabOrder": 25
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_fecha"
+                    }
+                  },
+                  "Property": "anio_mes"
+                }
+              },
+              "queryRef": "dim_fecha.anio_mes",
+              "nativeQueryRef": "anio_mes",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Autosuficiencia %"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Autosuficiencia %",
+              "nativeQueryRef": "Autosuficiencia %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Autosuficiencia mes anterior %"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Autosuficiencia mes anterior %",
+              "nativeQueryRef": "Autosuficiencia mes anterior %"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Autosuficiencia vs mes anterior'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
+  "pageOrder": [
+    "9dbde995c48769768c1b",
+    "pagBalanceEnergetico",
+    "pagEconomiaEscenarios"
+  ],
+  "activePageName": "pagEconomiaEscenarios"
+}

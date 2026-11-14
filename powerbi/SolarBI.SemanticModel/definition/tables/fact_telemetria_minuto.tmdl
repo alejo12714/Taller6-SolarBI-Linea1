@@ -1,0 +1,293 @@
+table fact_telemetria_minuto
+	lineageTag: 984fe181-b551-4f1b-a028-a9e92e0a7f5f
+
+	measure 'E PV kWh' = SUM(fact_telemetria_minuto[e_pv_kwh])
+		formatString: #,0.0
+		displayFolder: Energía
+		lineageTag: 1b53ec62-3a8e-56d8-abb7-a6b178c561e0
+
+	measure 'E Carga kWh' = SUM(fact_telemetria_minuto[e_carga_kwh])
+		formatString: #,0.0
+		displayFolder: Energía
+		lineageTag: 00b7f311-547f-5e05-99f2-ab2deec94a4d
+
+	measure 'E Red kWh' = SUM(fact_telemetria_minuto[e_red_kwh])
+		formatString: #,0.0
+		displayFolder: Energía
+		lineageTag: d4e2c6f9-ee54-579b-8569-9be43ac86354
+
+	measure 'E Bat Carga kWh' = SUM(fact_telemetria_minuto[e_bat_carga_kwh])
+		formatString: #,0.0
+		displayFolder: Energía
+		lineageTag: 3bb76d72-2f03-5e9f-a874-275cabaf86d0
+
+	measure 'E Bat Descarga kWh' = SUM(fact_telemetria_minuto[e_bat_descarga_kwh])
+		formatString: #,0.0
+		displayFolder: Energía
+		lineageTag: 0d39398f-7873-51d2-8047-6efcd204fb59
+
+	measure 'Autosuficiencia %' = DIVIDE([E Carga kWh] - MIN([E Red kWh], [E Carga kWh]), [E Carga kWh])
+		formatString: 0.0%
+		displayFolder: Híbridos
+		lineageTag: 547b1f47-ef0a-56b2-859d-6af269fad0bd
+
+	measure 'Red excedente kWh' = MAX(0, [E Red kWh] - [E Carga kWh])
+		formatString: #,0.0
+		displayFolder: Híbridos
+		lineageTag: 155063b8-9c09-58ab-81a0-749fd0775b24
+
+	measure 'Cobertura solar %' = DIVIDE([E PV kWh], [E Carga kWh])
+		formatString: 0.0%
+		displayFolder: Híbridos
+		lineageTag: 707fae79-c1a0-539f-a492-3bd7f7e1078b
+
+	measure 'Balance no explicado kWh' = ([E PV kWh] + [E Red kWh] + [E Bat Descarga kWh]) - ([E Carga kWh] + [E Bat Carga kWh])
+		formatString: #,0.0
+		displayFolder: Híbridos
+		lineageTag: c98bc4dc-8142-5d6a-9405-2f156484787b
+
+	measure 'Cierre del balance %' = DIVIDE([Balance no explicado kWh], [E PV kWh] + [E Red kWh] + [E Bat Descarga kWh])
+		formatString: 0.0%
+		displayFolder: Híbridos
+		lineageTag: 2d178d54-6877-5270-9c61-5f055613f6aa
+
+	measure 'Eficiencia aparente batería %' = DIVIDE([E Bat Descarga kWh], [E Bat Carga kWh])
+		formatString: 0.0%
+		displayFolder: Híbridos
+		lineageTag: aaaa5fa6-904b-5384-83d4-29f9043bea55
+
+	measure 'Ciclos equivalentes' = DIVIDE([E Bat Descarga kWh], MAX(dim_inversor[capacidad_bat_ah]) * 51.2 / 1000)
+		formatString: #,0.0
+		displayFolder: Híbridos
+		lineageTag: 14070af7-6173-54c6-b003-86e06ba2e39a
+
+	measure 'Dependencia nocturna de red %' = DIVIDE(CALCULATE([E Red kWh], dim_tiempo[es_ventana_solar] = FALSE()), [E Red kWh])
+		formatString: 0.0%
+		displayFolder: Híbridos
+		lineageTag: 3427d1a6-79bd-559f-9928-28adf10ba28d
+
+	measure 'E PV MTD' = TOTALMTD([E PV kWh], dim_fecha[fecha])
+		formatString: #,0.0
+		displayFolder: Inteligencia de tiempo
+		lineageTag: fc1dcf08-f0e6-5375-b04a-73bf092ff6d7
+
+	measure 'E PV YTD' = TOTALYTD([E PV kWh], dim_fecha[fecha])
+		formatString: #,0.0
+		displayFolder: Inteligencia de tiempo
+		lineageTag: 26cc2937-9760-5ecd-8252-a96121be4613
+
+	measure 'E PV mes anterior' = CALCULATE([E PV kWh], DATEADD(dim_fecha[fecha], -1, MONTH))
+		formatString: #,0.0
+		displayFolder: Inteligencia de tiempo
+		lineageTag: 6150d70d-5c94-51bb-a1bc-e86af5390bd5
+
+	measure 'Var PV MoM %' = DIVIDE([E PV kWh] - [E PV mes anterior], [E PV mes anterior])
+		formatString: 0.0%
+		displayFolder: Inteligencia de tiempo
+		lineageTag: 5931a55f-1ed7-5aa9-aa07-183a0c1acd36
+
+	measure 'Autosuficiencia mes anterior %' = CALCULATE([Autosuficiencia %], DATEADD(dim_fecha[fecha], -1, MONTH))
+		formatString: 0.0%
+		displayFolder: Inteligencia de tiempo
+		lineageTag: 800aeda8-8e37-5fa2-998f-a1037fb8060c
+
+	measure 'Costo red COP' = [E Red kWh] * [Valor Tarifa]
+		formatString: $ #,0
+		displayFolder: Económico
+		lineageTag: 083f2196-dbb6-5efd-893d-5bc4771ea6aa
+
+	measure 'Ahorro autosuficiencia COP' = ([E Carga kWh] - MIN([E Red kWh], [E Carga kWh])) * [Valor Tarifa]
+		formatString: $ #,0
+		displayFolder: Económico
+		lineageTag: a2cd4de3-d6e0-5a1a-9b39-3a3f8945d0e2
+
+	measure 'Ahorro YTD COP' = VAR ult = CALCULATE(MAX(dim_fecha[fecha]), fact_telemetria_minuto) RETURN CALCULATE([Ahorro autosuficiencia COP], DATESBETWEEN(dim_fecha[fecha], DATE(YEAR(ult), 1, 1), ult))
+		formatString: $ #,0
+		displayFolder: Económico
+		lineageTag: ab06e24f-b466-5e0c-a017-367e760606fd
+
+	measure 'E Red escenario kWh' = VAR f = [Valor Factor PV] RETURN SUMX(fact_telemetria_minuto, MAX(0, fact_telemetria_minuto[e_red_kwh] - (f - 1) * fact_telemetria_minuto[e_pv_kwh]))
+		formatString: #,0.0
+		displayFolder: Económico
+		lineageTag: 06b64031-9300-544b-8f6d-06d635ae2da4
+
+	measure 'Ahorro adicional escenario COP' = ([E Red kWh] - [E Red escenario kWh]) * [Valor Tarifa]
+		formatString: $ #,0
+		displayFolder: Económico
+		lineageTag: 20c32e9f-cb45-57bd-843e-250c596d9b7c
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 853df5da-52d9-4cb0-8acd-225c843bd6de
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_tiempo
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6e9b8d9c-8994-4394-8b86-ac9d233e1530
+		summarizeBy: none
+		sourceColumn: sk_tiempo
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0511da0b-9941-4adb-8d19-0f2e4f5d600f
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+		annotation SummarizationSetBy = Automatic
+
+	column ts_minuto_utc
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1067f304-ad34-474b-ac40-66faad00089d
+		summarizeBy: none
+		sourceColumn: ts_minuto_utc
+
+		annotation SummarizationSetBy = Automatic
+
+	column n_lecturas
+		dataType: int64
+		formatString: 0
+		lineageTag: bc0996db-9bb1-410d-a250-1f3d410ec5cc
+		summarizeBy: sum
+		sourceColumn: n_lecturas
+
+		annotation SummarizationSetBy = Automatic
+
+	column n_validas
+		dataType: int64
+		formatString: 0
+		lineageTag: 56097b8d-52f3-4a26-9e49-3d0f6e5a12fa
+		summarizeBy: sum
+		sourceColumn: n_validas
+
+		annotation SummarizationSetBy = Automatic
+
+	column seg_cubiertos
+		dataType: double
+		lineageTag: cefa845d-f929-41f8-b7ce-c0d50344cd71
+		summarizeBy: sum
+		sourceColumn: seg_cubiertos
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column seg_cubiertos_valid
+		dataType: double
+		lineageTag: f1e968a0-3229-48f8-ad6d-586c76b89444
+		summarizeBy: sum
+		sourceColumn: seg_cubiertos_valid
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column e_pv_kwh
+		dataType: double
+		lineageTag: 92f77e95-4c54-4de3-90dc-7d1f71e14b76
+		summarizeBy: sum
+		sourceColumn: e_pv_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column e_carga_kwh
+		dataType: double
+		lineageTag: 2a0c7143-42b3-4aa7-8f03-ecc01c6fd3c3
+		summarizeBy: sum
+		sourceColumn: e_carga_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column e_red_kwh
+		dataType: double
+		lineageTag: 8c5dd5c1-9bce-422a-abeb-05e53257f712
+		summarizeBy: sum
+		sourceColumn: e_red_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column e_bat_carga_kwh
+		dataType: double
+		lineageTag: ff806047-8a31-459a-8735-4f04aabbf0af
+		summarizeBy: sum
+		sourceColumn: e_bat_carga_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column e_bat_descarga_kwh
+		dataType: double
+		lineageTag: 541e2be9-5b06-4485-8b02-9370e65deced
+		summarizeBy: sum
+		sourceColumn: e_bat_descarga_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column soc_prom_pct
+		dataType: double
+		lineageTag: 92720423-e5de-478b-a8f5-eec0a67901a5
+		summarizeBy: sum
+		sourceColumn: soc_prom_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column soc_min_pct
+		dataType: int64
+		formatString: 0
+		lineageTag: 29df2931-bfc8-4aa0-8a00-0a9eb65dd019
+		summarizeBy: sum
+		sourceColumn: soc_min_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column p_pv_max_w
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a7a422b-0aab-4acd-9e59-d41889e48258
+		summarizeBy: sum
+		sourceColumn: p_pv_max_w
+
+		annotation SummarizationSetBy = Automatic
+
+	column origen
+		dataType: string
+		lineageTag: 4dec6e6c-ccbf-4f94-8f5a-e30282914d07
+		summarizeBy: none
+		sourceColumn: origen
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_telemetria_minuto = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="fact_telemetria_minuto"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_fecha", "sk_tiempo", "sk_inversor", "ts_minuto_utc", "n_lecturas", "n_validas", "seg_cubiertos", "seg_cubiertos_valid", "e_pv_kwh", "e_carga_kwh", "e_red_kwh", "e_bat_carga_kwh", "e_bat_descarga_kwh", "soc_prom_pct", "soc_min_pct", "p_pv_max_w", "origen"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

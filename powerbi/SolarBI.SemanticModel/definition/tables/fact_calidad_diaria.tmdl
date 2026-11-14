@@ -1,0 +1,78 @@
+table fact_calidad_diaria
+	lineageTag: 6263e3a1-c016-433d-8294-0d89a9bf56a1
+
+	measure 'Lecturas evaluadas' = SUM(fact_calidad_diaria[lecturas_evaluadas])
+		formatString: #,0
+		displayFolder: Calidad
+		lineageTag: ccafaa3d-80cb-54dc-9daa-65a0ed3f8ec5
+
+	measure 'Lecturas afectadas' = SUM(fact_calidad_diaria[lecturas_afectadas])
+		formatString: #,0
+		displayFolder: Calidad
+		lineageTag: 57f2373c-bbfc-50e9-bc83-6c80d6b61dfb
+
+	measure 'Tasa violación regla %' = DIVIDE([Lecturas afectadas], [Lecturas evaluadas])
+		formatString: 0.00%
+		displayFolder: Calidad
+		lineageTag: b79d6f63-04f5-5f62-9c2f-a1bb919d27fa
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 97b36020-39f4-45cd-8dd4-a3fc4bbe0912
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9b295dcd-51e9-471e-b210-309b615d431f
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_regla
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2bf198ec-228a-49ab-8fed-e67f2f5b7277
+		summarizeBy: none
+		sourceColumn: sk_regla
+
+		annotation SummarizationSetBy = Automatic
+
+	column lecturas_evaluadas
+		dataType: int64
+		formatString: 0
+		lineageTag: 9afa491c-4c8c-4104-9088-54aa7770b84c
+		summarizeBy: sum
+		sourceColumn: lecturas_evaluadas
+
+		annotation SummarizationSetBy = Automatic
+
+	column lecturas_afectadas
+		dataType: int64
+		formatString: 0
+		lineageTag: 675317a3-2c58-4398-a191-771f6ede26b6
+		summarizeBy: sum
+		sourceColumn: lecturas_afectadas
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_calidad_diaria = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="fact_calidad_diaria"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_fecha", "sk_inversor", "sk_regla", "lecturas_evaluadas", "lecturas_afectadas"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

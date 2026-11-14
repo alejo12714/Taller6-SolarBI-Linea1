@@ -1,0 +1,136 @@
+table fact_disponibilidad_diaria
+	lineageTag: 8ad3c08a-5cd0-43ba-9ef5-781913f5fc9e
+
+	measure 'Lecturas recibidas' = SUM(fact_disponibilidad_diaria[lecturas_recibidas])
+		formatString: #,0
+		displayFolder: Calidad
+		lineageTag: 1a379cda-f9ae-599e-a86a-a776956baf5c
+
+	measure 'Lecturas válidas' = SUM(fact_disponibilidad_diaria[lecturas_validas])
+		formatString: #,0
+		displayFolder: Calidad
+		lineageTag: 46430136-423c-508a-ac0f-ffa21ee125d6
+
+	measure 'Lecturas inválidas' = [Lecturas recibidas] - [Lecturas válidas]
+		formatString: #,0
+		displayFolder: Calidad
+		lineageTag: d915e8a2-5642-5bf2-b6e2-e79906b7355b
+
+	measure '% Lecturas válidas' = DIVIDE([Lecturas válidas], [Lecturas recibidas])
+		formatString: 0.00%
+		displayFolder: Calidad
+		lineageTag: efaaae91-2a1e-56a3-81ac-19332f8ca32b
+
+	measure 'Días en ventana de registro' = COUNTROWS(FILTER(dim_fecha, dim_fecha[fecha] >= DATE(2025, 7, 12) && dim_fecha[fecha] <= DATE(2026, 7, 13)))
+		formatString: #,0
+		displayFolder: Calidad
+		lineageTag: 619ae5ee-78ff-509a-9bd0-07b25a988247
+
+	measure 'Inversores en contexto' = COUNTROWS(FILTER(VALUES(dim_inversor[inversor_id]), dim_inversor[inversor_id] > 0))
+		formatString: 0
+		displayFolder: Calidad
+		lineageTag: 10759168-b388-52b3-aae6-356cefb29b91
+
+	measure 'Disponibilidad registro %' = DIVIDE(SUM(fact_disponibilidad_diaria[seg_cubiertos_valid]), [Días en ventana de registro] * 86400 * [Inversores en contexto])
+		formatString: 0.0%
+		displayFolder: Calidad
+		lineageTag: 6648ef46-9c20-5824-b1fe-3e6df9ad7f1e
+
+	measure 'Huecos > 10 min' = SUM(fact_disponibilidad_diaria[huecos_mayor_10min])
+		formatString: #,0
+		displayFolder: Calidad
+		lineageTag: 2e09e143-c1da-5f4a-a84d-2c264ce289ca
+
+	measure '% Válidas MM7' = AVERAGEX(DATESINPERIOD(dim_fecha[fecha], MAX(dim_fecha[fecha]), -7, DAY), [% Lecturas válidas])
+		formatString: 0.00%
+		displayFolder: Calidad
+		lineageTag: 425ee909-45f0-5f17-a94f-e56d9e7cb91a
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cb00d768-fff0-4c11-9f29-43accc7224aa
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 61729d1a-0693-49ed-829e-36880b52c5be
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+		annotation SummarizationSetBy = Automatic
+
+	column lecturas_recibidas
+		dataType: int64
+		formatString: 0
+		lineageTag: d7f641a2-b1ea-481b-a028-9881d4fdcbc3
+		summarizeBy: sum
+		sourceColumn: lecturas_recibidas
+
+		annotation SummarizationSetBy = Automatic
+
+	column lecturas_validas
+		dataType: int64
+		formatString: 0
+		lineageTag: 67c22c08-5aaf-4a20-9627-49f045ac8a76
+		summarizeBy: sum
+		sourceColumn: lecturas_validas
+
+		annotation SummarizationSetBy = Automatic
+
+	column seg_cubiertos
+		dataType: double
+		lineageTag: a627879e-60ef-48b0-a939-083db20127bc
+		summarizeBy: sum
+		sourceColumn: seg_cubiertos
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column seg_cubiertos_valid
+		dataType: double
+		lineageTag: 3da6c675-3f6a-4384-ba27-a59b4d7b203a
+		summarizeBy: sum
+		sourceColumn: seg_cubiertos_valid
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column seg_periodo
+		dataType: int64
+		formatString: 0
+		lineageTag: 5826adff-2b7b-48a4-ad8b-370c63d3aff9
+		summarizeBy: sum
+		sourceColumn: seg_periodo
+
+		annotation SummarizationSetBy = Automatic
+
+	column huecos_mayor_10min
+		dataType: int64
+		formatString: 0
+		lineageTag: eeb81bea-806b-46cc-8126-d4cdfe46b8e5
+		summarizeBy: sum
+		sourceColumn: huecos_mayor_10min
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_disponibilidad_diaria = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="fact_disponibilidad_diaria"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_fecha", "sk_inversor", "lecturas_recibidas", "lecturas_validas", "seg_cubiertos", "seg_cubiertos_valid", "seg_periodo", "huecos_mayor_10min"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

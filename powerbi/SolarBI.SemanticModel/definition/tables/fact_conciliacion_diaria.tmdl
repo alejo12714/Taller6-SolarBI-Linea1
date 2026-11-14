@@ -1,0 +1,115 @@
+table fact_conciliacion_diaria
+	lineageTag: c79fabf6-4944-4bbc-85b7-d85bdc220b32
+
+	measure 'Disponibilidad día %' = AVERAGE(fact_conciliacion_diaria[disponibilidad_pct])
+		formatString: #,0.0
+		displayFolder: Calidad
+		lineageTag: 8b0a6f0e-1c11-4a3e-9d1e-0c2b7a1f0001
+
+	measure 'Desviación PV día %' = AVERAGE(fact_conciliacion_diaria[desv_pv_pct])
+		formatString: #,0.0
+		displayFolder: Calidad
+		lineageTag: 8b0a6f0e-1c11-4a3e-9d1e-0c2b7a1f0002
+
+	measure 'Desviación conciliación PV %' = VAR d = FILTER(fact_conciliacion_diaria, NOT ISBLANK(fact_conciliacion_diaria[pv_kwh_contador]) && fact_conciliacion_diaria[pv_kwh_contador] > 0) RETURN DIVIDE(SUMX(d, fact_conciliacion_diaria[pv_kwh_integrado] - fact_conciliacion_diaria[pv_kwh_contador]), SUMX(d, fact_conciliacion_diaria[pv_kwh_contador]))
+		formatString: 0.0%
+		displayFolder: Calidad
+		lineageTag: 90fc597c-cdfe-54b3-be71-91cf30218b59
+
+	measure 'Días que concilian %' = DIVIDE(COUNTROWS(FILTER(fact_conciliacion_diaria, NOT ISBLANK(fact_conciliacion_diaria[desv_pv_pct]) && ABS(fact_conciliacion_diaria[desv_pv_pct]) <= 20)), COUNTROWS(FILTER(fact_conciliacion_diaria, NOT ISBLANK(fact_conciliacion_diaria[desv_pv_pct]))))
+		formatString: 0.0%
+		displayFolder: Calidad
+		lineageTag: 73e2fd14-d430-52ae-8a7d-051d57ba0546
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0dfc5c61-c6ba-4055-9f8d-6c29d85f90fe
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 505e046a-d699-4d9c-8cc2-90f22bc009f5
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+		annotation SummarizationSetBy = Automatic
+
+	column pv_kwh_integrado
+		dataType: double
+		lineageTag: 47b505dc-82ba-4a87-9777-0339ff4c714b
+		summarizeBy: sum
+		sourceColumn: pv_kwh_integrado
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pv_kwh_contador
+		dataType: double
+		lineageTag: 3d45cf03-0045-4f16-bc94-bf196f185c01
+		summarizeBy: sum
+		sourceColumn: pv_kwh_contador
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column carga_kwh_integrado
+		dataType: double
+		lineageTag: 7befe34c-6a2c-45c2-85de-a8ccc2f10af1
+		summarizeBy: sum
+		sourceColumn: carga_kwh_integrado
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column uso_kwh_contador
+		dataType: double
+		lineageTag: 01611a5f-73b5-465a-9856-d60934982d74
+		summarizeBy: sum
+		sourceColumn: uso_kwh_contador
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column desv_pv_pct
+		dataType: double
+		lineageTag: 70a8dca8-4b5f-4f84-9e78-cf39e3971773
+		summarizeBy: sum
+		sourceColumn: desv_pv_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column disponibilidad_pct
+		dataType: double
+		lineageTag: 2c7da1b3-f98a-4ee9-84f6-357767c82b2b
+		summarizeBy: sum
+		sourceColumn: disponibilidad_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition fact_conciliacion_diaria = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="fact_conciliacion_diaria"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_fecha", "sk_inversor", "pv_kwh_integrado", "pv_kwh_contador", "carga_kwh_integrado", "uso_kwh_contador", "desv_pv_pct", "disponibilidad_pct"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

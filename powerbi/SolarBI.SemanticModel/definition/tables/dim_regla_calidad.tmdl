@@ -1,0 +1,90 @@
+table dim_regla_calidad
+	lineageTag: a73140dc-a082-4bd0-8266-c09067f611d2
+
+	column sk_regla
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8149a569-b60b-4a16-bee4-c5138d58b0c6
+		summarizeBy: none
+		sourceColumn: sk_regla
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo
+		dataType: string
+		lineageTag: d93ce51d-d694-4ae9-aff1-1ceb18c22bcc
+		summarizeBy: none
+		sourceColumn: codigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre
+		dataType: string
+		lineageTag: 82c61045-b8b5-4303-99e9-3781b8ccb94b
+		summarizeBy: none
+		sourceColumn: nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column dimension_dq
+		dataType: string
+		lineageTag: 846b8ae8-748c-407c-970c-905d717d6e68
+		summarizeBy: none
+		sourceColumn: dimension_dq
+
+		annotation SummarizationSetBy = Automatic
+
+	column nivel
+		dataType: string
+		lineageTag: 2b55b98d-3ac6-4836-b5a9-a5b497426c7c
+		summarizeBy: none
+		sourceColumn: nivel
+
+		annotation SummarizationSetBy = Automatic
+
+	column accion
+		dataType: string
+		lineageTag: cd77b080-df40-44f1-af3a-d72d53e94a72
+		summarizeBy: none
+		sourceColumn: accion
+
+		annotation SummarizationSetBy = Automatic
+
+	column severidad
+		dataType: int64
+		formatString: 0
+		lineageTag: df51fd7d-64c9-4f3b-98d1-02ee1c092cb8
+		summarizeBy: none
+		sourceColumn: severidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column expresion
+		dataType: string
+		lineageTag: 56972db0-c159-4b44-8a78-3473dc9d381e
+		summarizeBy: none
+		sourceColumn: expresion
+
+		annotation SummarizationSetBy = Automatic
+
+	column evidencia
+		dataType: string
+		lineageTag: a4758c2d-c1aa-423c-b414-6452fa52e978
+		summarizeBy: none
+		sourceColumn: evidencia
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_regla_calidad = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="dim_regla_calidad"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_regla", "codigo", "nombre", "dimension_dq", "nivel", "accion", "severidad", "expresion", "evidencia"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

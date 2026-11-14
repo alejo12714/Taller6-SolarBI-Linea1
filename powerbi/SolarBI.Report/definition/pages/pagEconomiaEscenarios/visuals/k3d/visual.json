@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "k3d",
+  "position": {
+    "x": 1190,
+    "y": 80,
+    "z": 34,
+    "height": 130,
+    "width": 420,
+    "tabOrder": 34
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Ahorro adicional escenario COP"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Ahorro adicional escenario COP",
+              "nativeQueryRef": "Ahorro adicional escenario COP"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ahorro adicional del escenario PV'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

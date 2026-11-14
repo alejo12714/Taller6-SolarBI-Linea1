@@ -1,0 +1,204 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 377.55344420938178,
+            "y": 452.25592820571057
+          },
+          "nodeIndex": "dim_fecha",
+          "nodeLineageTag": "0b9706c0-602d-5916-9bde-e2be407a84c3",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 664.28289529723986,
+            "y": 560.83473568122167
+          },
+          "nodeIndex": "dim_inversor",
+          "nodeLineageTag": "e341c549-1546-5d4c-9b81-92ba8b51a963",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 865.48749545158012
+          },
+          "nodeIndex": "dim_regla_calidad",
+          "nodeLineageTag": "ffc529fb-d1ca-5f9b-87e7-a2be17628869",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 829.2676614557372,
+            "y": -50
+          },
+          "nodeIndex": "dim_tiempo",
+          "nodeLineageTag": "8c9f98b8-bb71-5d4b-8ff4-e6a4a3077bbb",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1263.9739043031107,
+            "y": 234.6194509887905
+          },
+          "nodeIndex": "dim_tipo_evento",
+          "nodeLineageTag": "b3d683c0-867b-5575-acfe-3bfe4cff4c6e",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 87.999729273134051,
+            "y": 534.93974884410409
+          },
+          "nodeIndex": "fact_calidad_diaria",
+          "nodeLineageTag": "3d98f32d-bb30-53f9-93d3-4b6e9b0806e2",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 371.53248267355241,
+            "y": 871.51245296483216
+          },
+          "nodeIndex": "fact_conciliacion_diaria",
+          "nodeLineageTag": "3922d19f-eb61-506a-93fd-df9c4bd38add",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 811.10081783076316,
+            "y": 921.60368710928583
+          },
+          "nodeIndex": "fact_disponibilidad_diaria",
+          "nodeLineageTag": "3e613078-8726-55a6-82b9-79c586c79a43",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 999.16683219052572,
+            "y": 560.697343840116
+          },
+          "nodeIndex": "fact_evento_operativo",
+          "nodeLineageTag": "54a219c2-21b5-5867-b5c5-8faa2509605d",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 536.47258873674855,
+            "y": 91.441957900783791
+          },
+          "nodeIndex": "fact_telemetria_minuto",
+          "nodeLineageTag": "48bbd00b-b218-5350-9034-e3c8082f64f8",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1497.9739043031107,
+            "y": 523.801843554643
+          },
+          "nodeIndex": "Factor PV",
+          "nodeLineageTag": "737c2135-f13c-50e7-899e-8038c2a71f03",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1781.9739043031107,
+            "y": 523.801843554643
+          },
+          "nodeIndex": "Tarifa",
+          "nodeLineageTag": "353e4917-d148-5226-96c0-d125b61ad965",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2015.9739043031107,
+            "y": 583.80184355464291
+          },
+          "nodeIndex": "BaseDatosPG",
+          "nodeLineageTag": "d02731a2-c5c6-4001-9f5c-addb1f44d53f",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2299.9739043031104,
+            "y": 583.80184355464291
+          },
+          "nodeIndex": "ServidorPG",
+          "nodeLineageTag": "de6afc22-83c3-41d4-a832-6f423c3cee4b",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas las tablas",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas las tablas",
+  "defaultDiagram": "Todas las tablas"
+}

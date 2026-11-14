@@ -1,0 +1,24 @@
+table Tarifa
+	lineageTag: 353e4917-d148-5226-96c0-d125b61ad965
+
+	measure 'Valor Tarifa' = SELECTEDVALUE('Tarifa'[Tarifa], 920)
+		formatString: #,0
+		lineageTag: d8c03423-9ca4-5ab2-b909-d65623c3b7c3
+
+	column Tarifa
+		formatString: #,0
+		lineageTag: c2d677fb-7da7-598b-8f47-49844811ffc4
+		summarizeBy: none
+		sourceColumn: [Tarifa]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+	partition Tarifa = calculated
+		mode: import
+		source = SELECTCOLUMNS(GENERATESERIES(600, 1500, 20), "Tarifa", [Value])
+
+	annotation PBI_Id = fba1461df1374bef8160a05a4447df02
+

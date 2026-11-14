@@ -1,0 +1,158 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "t3",
+  "position": {
+    "x": 320,
+    "y": 650,
+    "z": 37,
+    "height": 410,
+    "width": 1580,
+    "tabOrder": 37
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_inversor"
+                    }
+                  },
+                  "Property": "nombre"
+                }
+              },
+              "queryRef": "dim_inversor.nombre",
+              "nativeQueryRef": "nombre"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "E PV kWh"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.E PV kWh",
+              "nativeQueryRef": "E PV kWh"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "E Red kWh"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.E Red kWh",
+              "nativeQueryRef": "E Red kWh"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Autosuficiencia %"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Autosuficiencia %",
+              "nativeQueryRef": "Autosuficiencia %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Costo red COP"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Costo red COP",
+              "nativeQueryRef": "Costo red COP"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "E Red escenario kWh"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.E Red escenario kWh",
+              "nativeQueryRef": "E Red escenario kWh"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Ahorro adicional escenario COP"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Ahorro adicional escenario COP",
+              "nativeQueryRef": "Ahorro adicional escenario COP"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Ciclos equivalentes"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Ciclos equivalentes",
+              "nativeQueryRef": "Ciclos equivalentes"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Resumen por inversor'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "k1b",
+  "position": {
+    "x": 610,
+    "y": 80,
+    "z": 5,
+    "height": 130,
+    "width": 280,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_disponibilidad_diaria"
+                    }
+                  },
+                  "Property": "Disponibilidad registro %"
+                }
+              },
+              "queryRef": "fact_disponibilidad_diaria.Disponibilidad registro %",
+              "nativeQueryRef": "Disponibilidad registro %"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Disponibilidad del registro (calendario)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

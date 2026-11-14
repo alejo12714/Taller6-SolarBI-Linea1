@@ -1,0 +1,112 @@
+table fact_evento_operativo
+	lineageTag: f180b4d5-e080-466b-9a66-c1320f43ae15
+
+	measure Eventos = SUM(fact_evento_operativo[conteo])
+		formatString: #,0
+		displayFolder: Eventos
+		lineageTag: 987977e6-da76-5283-ba81-27c918b06e64
+
+	measure 'Horas en evento' = DIVIDE(SUM(fact_evento_operativo[duracion_s]), 3600)
+		formatString: #,0.0
+		displayFolder: Eventos
+		lineageTag: cc9461fd-f781-52c2-93ad-5642d7701cad
+
+	column sk_evento
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 32d44ca7-d009-4a38-954b-663f441b2aa3
+		summarizeBy: sum
+		sourceColumn: sk_evento
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4c396608-ee31-42d8-833d-8362385225d5
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_tiempo
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6dbcada6-9115-4ddf-9237-282b2fbbfc26
+		summarizeBy: none
+		sourceColumn: sk_tiempo
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 39dcd7c0-7970-4cc1-ba02-f9a8d7ee4acc
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+		annotation SummarizationSetBy = Automatic
+
+	column sk_tipo_evento
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c61c4bb0-0bc6-4da3-a24f-5b5e702ed4ba
+		summarizeBy: none
+		sourceColumn: sk_tipo_evento
+
+		annotation SummarizationSetBy = Automatic
+
+	column inicio_utc
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 86ae2068-ea2b-4b67-acc0-65125469680f
+		summarizeBy: none
+		sourceColumn: inicio_utc
+
+		annotation SummarizationSetBy = Automatic
+
+	column fin_utc
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a3f5abec-ca96-4245-a305-cd72eecfd7e6
+		summarizeBy: none
+		sourceColumn: fin_utc
+
+		annotation SummarizationSetBy = Automatic
+
+	column duracion_s
+		dataType: double
+		lineageTag: 68af3225-ca56-402d-80a7-578a2819f6d4
+		summarizeBy: sum
+		sourceColumn: duracion_s
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column conteo
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c1b933c-0dcc-4ddd-9767-e32ac0aa2617
+		summarizeBy: sum
+		sourceColumn: conteo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_evento_operativo = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="fact_evento_operativo"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_evento", "sk_fecha", "sk_tiempo", "sk_inversor", "sk_tipo_evento", "inicio_utc", "fin_utc", "duracion_s", "conteo"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,19 @@
+table BaseDatosPG
+	isHidden
+	lineageTag: d02731a2-c5c6-4001-9f5c-addb1f44d53f
+
+	column BaseDatosPG
+		dataType: string
+		isHidden
+		lineageTag: d15f976f-099b-4e95-b8b7-37b8b137e894
+		summarizeBy: none
+		sourceColumn: BaseDatosPG
+
+		annotation SummarizationSetBy = Automatic
+
+	partition BaseDatosPG = m
+		mode: import
+		source = "solarbi" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+	annotation PBI_ResultType = Text
+

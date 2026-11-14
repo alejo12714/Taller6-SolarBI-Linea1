@@ -1,0 +1,65 @@
+table dim_tipo_evento
+	lineageTag: 47198e01-ba54-4994-92f9-d62850f21d2e
+
+	column sk_tipo_evento
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0777c5c4-56ba-4aad-ac50-b1c9efc733ad
+		summarizeBy: none
+		sourceColumn: sk_tipo_evento
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo
+		dataType: string
+		lineageTag: b34e550b-5ca6-4161-92a2-dcf39bc0ca8d
+		summarizeBy: none
+		sourceColumn: codigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria
+		dataType: string
+		lineageTag: 88cb4044-7a08-41f1-84d6-abab01f7db44
+		summarizeBy: none
+		sourceColumn: categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column severidad
+		dataType: string
+		lineageTag: 6c2f73b7-1d5a-4e5d-aae5-daaae1b3e3da
+		summarizeBy: none
+		sourceColumn: severidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column origen
+		dataType: string
+		lineageTag: c47bc6d0-a65b-4de2-b786-1d15e76b2772
+		summarizeBy: none
+		sourceColumn: origen
+
+		annotation SummarizationSetBy = Automatic
+
+	column criterio
+		dataType: string
+		lineageTag: c7fda78a-91bf-45e5-a916-8b0d72c0ef53
+		summarizeBy: none
+		sourceColumn: criterio
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_tipo_evento = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="dim_tipo_evento"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_tipo_evento", "codigo", "categoria", "severidad", "origen", "criterio"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

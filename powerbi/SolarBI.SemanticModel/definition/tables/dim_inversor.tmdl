@@ -1,0 +1,114 @@
+table dim_inversor
+	lineageTag: 53221d28-53d8-4700-a1eb-17c8d6b205b2
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e390341c-46ed-403c-822d-d9f32402be2e
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+		annotation SummarizationSetBy = Automatic
+
+	column inversor_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 508d1a9d-0550-4b19-b0eb-887045ef5b23
+		summarizeBy: sum
+		sourceColumn: inversor_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre
+		dataType: string
+		lineageTag: afefbd28-57cc-4b77-8b6f-1a402fdaaae6
+		summarizeBy: none
+		sourceColumn: nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column subsistema
+		dataType: string
+		lineageTag: 5c519ef4-c9aa-49e2-b991-4bf6a6066797
+		summarizeBy: none
+		sourceColumn: subsistema
+
+		annotation SummarizationSetBy = Automatic
+
+	column version_protocolo
+		dataType: int64
+		formatString: 0
+		lineageTag: 2a4e3e5f-f58c-4592-8630-5fcd513a2019
+		summarizeBy: sum
+		sourceColumn: version_protocolo
+
+		annotation SummarizationSetBy = Automatic
+
+	column capacidad_bat_ah
+		dataType: double
+		lineageTag: b75c50a5-3a7a-43cb-a134-65df79b447d6
+		summarizeBy: sum
+		sourceColumn: capacidad_bat_ah
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column soc_alarma_pct
+		dataType: int64
+		formatString: 0
+		lineageTag: fda94dff-d5b6-4d0b-8b0f-2a8e1644a0eb
+		summarizeBy: sum
+		sourceColumn: soc_alarma_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column soc_parada_pct
+		dataType: int64
+		formatString: 0
+		lineageTag: 44d9bcf5-6faa-4c3a-b763-322fa31432fe
+		summarizeBy: sum
+		sourceColumn: soc_parada_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column vigente_desde
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b42e8c4e-813b-4136-9ead-33b82b3da221
+		summarizeBy: none
+		sourceColumn: vigente_desde
+
+		annotation SummarizationSetBy = Automatic
+
+	column vigente_hasta
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 311ad701-578f-4948-8a92-915c3b8bbf9e
+		summarizeBy: none
+		sourceColumn: vigente_hasta
+
+		annotation SummarizationSetBy = Automatic
+
+	column es_vigente
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c5ae74b5-a318-47e4-ac63-59487f800924
+		summarizeBy: none
+		sourceColumn: es_vigente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_inversor = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="dim_inversor"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_inversor", "inversor_id", "nombre", "subsistema", "version_protocolo", "capacidad_bat_ah", "soc_alarma_pct", "soc_parada_pct", "vigente_desde", "vigente_hasta", "es_vigente"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Exception
+

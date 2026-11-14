@@ -1,0 +1,68 @@
+table dim_tiempo
+	lineageTag: e350d1bf-d7f1-436b-a03a-dcc56d43fa8a
+
+	column sk_tiempo
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 85725068-246b-414a-be1c-149e2cc709b8
+		summarizeBy: none
+		sourceColumn: sk_tiempo
+
+		annotation SummarizationSetBy = Automatic
+
+	column hora
+		dataType: int64
+		formatString: 0
+		lineageTag: a25d531b-e5b3-49d3-8912-b2463bb3ce23
+		summarizeBy: sum
+		sourceColumn: hora
+
+		annotation SummarizationSetBy = Automatic
+
+	column minuto
+		dataType: int64
+		formatString: 0
+		lineageTag: 735c8997-8762-460b-b140-b3c575395a5a
+		summarizeBy: sum
+		sourceColumn: minuto
+
+		annotation SummarizationSetBy = Automatic
+
+	column hora_texto
+		dataType: string
+		lineageTag: a730a28f-080e-4fd0-803a-fab818bb32ae
+		summarizeBy: none
+		sourceColumn: hora_texto
+
+		annotation SummarizationSetBy = Automatic
+
+	column franja_horaria
+		dataType: string
+		lineageTag: fb99d472-3b84-4deb-9d9d-b035c5cea9b0
+		summarizeBy: none
+		sourceColumn: franja_horaria
+
+		annotation SummarizationSetBy = Automatic
+
+	column es_ventana_solar
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7fd3d07f-e612-4bfe-90eb-f2aeaf9bdcae
+		summarizeBy: none
+		sourceColumn: es_ventana_solar
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_tiempo = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPG, BaseDatosPG),
+				    Tabla = Origen{[Schema="gold",Item="dim_tiempo"]}[Data],
+				    Columnas = Table.SelectColumns(Tabla, {"sk_tiempo", "hora", "minuto", "hora_texto", "franja_horaria", "es_ventana_solar"})
+				in
+				    Columnas
+
+	annotation PBI_ResultType = Table
+

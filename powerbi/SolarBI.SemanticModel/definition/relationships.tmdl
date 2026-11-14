@@ -1,0 +1,56 @@
+relationship AutoDetected_0a0bb7d7-72a5-4a05-9379-9036adbecc8c
+	fromColumn: fact_calidad_diaria.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship AutoDetected_523a562b-1ee0-4fc0-8581-4b9c8df0293b
+	fromColumn: fact_conciliacion_diaria.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship AutoDetected_3beb7e90-b714-41bc-8664-36d0d329600e
+	fromColumn: fact_disponibilidad_diaria.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship AutoDetected_4dde8f69-cc33-4792-9410-a7cf4a5beb19
+	fromColumn: fact_evento_operativo.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship AutoDetected_ea6ef94a-b05d-4519-8b35-4429869d3c79
+	fromColumn: fact_telemetria_minuto.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship AutoDetected_a861e581-c868-4fa1-b94d-43b162800004
+	fromColumn: fact_calidad_diaria.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship AutoDetected_cad2311c-450e-4399-b0ac-c123e2b6dafd
+	fromColumn: fact_conciliacion_diaria.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship AutoDetected_cf5bfece-20a1-4ba3-a9b5-63ad2e2ab82d
+	fromColumn: fact_disponibilidad_diaria.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship AutoDetected_a644ba4a-20ef-46f4-8c48-1d26855ad4f1
+	fromColumn: fact_evento_operativo.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship AutoDetected_b76ae069-96b7-4583-9751-dd835cc26507
+	fromColumn: fact_telemetria_minuto.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship AutoDetected_17e8895f-d6a5-4690-a397-61c2ed0527c0
+	fromColumn: fact_calidad_diaria.sk_regla
+	toColumn: dim_regla_calidad.sk_regla
+
+relationship AutoDetected_775c95a6-686e-47d1-ad63-de43e695f2a0
+	fromColumn: fact_evento_operativo.sk_tiempo
+	toColumn: dim_tiempo.sk_tiempo
+
+relationship AutoDetected_3d1c7826-234c-4b4e-ac23-a3d0a348d7db
+	fromColumn: fact_telemetria_minuto.sk_tiempo
+	toColumn: dim_tiempo.sk_tiempo
+
+relationship AutoDetected_430b98d2-12b7-44cd-aa2d-8d16b7bf85aa
+	fromColumn: fact_evento_operativo.sk_tipo_evento
+	toColumn: dim_tipo_evento.sk_tipo_evento
+

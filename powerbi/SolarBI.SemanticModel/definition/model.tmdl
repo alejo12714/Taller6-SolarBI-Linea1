@@ -1,0 +1,32 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-MX
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["ServidorPG","BaseDatosPG","dim_fecha","dim_inversor","dim_regla_calidad","dim_tiempo","dim_tipo_evento","fact_calidad_diaria","fact_conciliacion_diaria","fact_disponibilidad_diaria","fact_evento_operativo","fact_telemetria_minuto"]
+
+ref table Tarifa
+ref table 'Factor PV'
+ref table ServidorPG
+ref table BaseDatosPG
+ref table dim_fecha
+ref table dim_inversor
+ref table dim_regla_calidad
+ref table dim_tiempo
+ref table dim_tipo_evento
+ref table fact_calidad_diaria
+ref table fact_conciliacion_diaria
+ref table fact_disponibilidad_diaria
+ref table fact_evento_operativo
+ref table fact_telemetria_minuto
+
+ref cultureInfo es-MX
+

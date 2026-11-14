@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "k1a",
+  "position": {
+    "x": 320,
+    "y": 80,
+    "z": 4,
+    "height": 130,
+    "width": 280,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_disponibilidad_diaria"
+                    }
+                  },
+                  "Property": "% Lecturas válidas"
+                }
+              },
+              "queryRef": "fact_disponibilidad_diaria.% Lecturas válidas",
+              "nativeQueryRef": "% Lecturas válidas"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'% lecturas válidas'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

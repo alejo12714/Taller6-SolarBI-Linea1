@@ -1,0 +1,24 @@
+table 'Factor PV'
+	lineageTag: 737c2135-f13c-50e7-899e-8038c2a71f03
+
+	measure 'Valor Factor PV' = SELECTEDVALUE('Factor PV'[Factor PV], 1)
+		formatString: 0.0
+		lineageTag: 7e7aabe2-4795-5b6e-84c5-d1abe21b185f
+
+	column 'Factor PV'
+		formatString: 0.0
+		lineageTag: 6f90ba28-bd30-5f51-af7d-060ae00cbfd0
+		summarizeBy: none
+		sourceColumn: [Factor PV]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+	partition 'Factor PV' = calculated
+		mode: import
+		source = SELECTCOLUMNS(GENERATESERIES(1, 2, 0.1), "Factor PV", [Value])
+
+	annotation PBI_Id = 7c87d0f7f8ad45ab9fd6783fd9609692
+

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "k3c",
+  "position": {
+    "x": 900,
+    "y": 80,
+    "z": 33,
+    "height": 130,
+    "width": 280,
+    "tabOrder": 33
+  },
+  "visual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_telemetria_minuto"
+                    }
+                  },
+                  "Property": "Ahorro YTD COP"
+                }
+              },
+              "queryRef": "fact_telemetria_minuto.Ahorro YTD COP",
+              "nativeQueryRef": "Ahorro YTD COP"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ahorro acumulado del año'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
