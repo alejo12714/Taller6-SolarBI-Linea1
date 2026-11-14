@@ -1,0 +1,16 @@
+OpenCEM dataset licence
+
+Copyright (c) 2026 The OpenCEM dataset authors
+
+The SQLite data, retained sky images, documentation, and release manifests are
+licensed under the Creative Commons Attribution 4.0 International licence
+(CC BY 4.0).
+
+You may share and adapt the material for any purpose provided that you give
+appropriate credit, link to the licence, and indicate whether changes were made.
+The complete legal code is available at:
+
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+Code distributed with this release is covered separately by the MIT licence in
+the corresponding code directories.
