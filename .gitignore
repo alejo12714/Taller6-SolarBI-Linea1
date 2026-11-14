@@ -1,0 +1,21 @@
+# Datos (Bronze): se descargan de Zenodo, nunca se versionan
+data/
+*.sqlite
+*.sqlite.zst
+*.tar.zst
+# Credenciales: solo se versiona .env.example
+.env
+# Python
+__pycache__/
+*.pyc
+.venv/
+# Power BI (PBIP): se versiona el proyecto, no la caché ni la config local
+powerbi/**/.pbi/localSettings.json
+powerbi/**/.pbi/cache.abf
+*.pbix
+
+# Volcado local de Gold para Power BI (datos, no se versiona)
+powerbi-db/
+
+# Soporte del dataset ya descomprimido (se regenera desde el .zip; incluye un CSV de 17 MB)
+descargas-SolarBI/opencem-v1.0.0-support/
