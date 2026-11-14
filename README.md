@@ -1,0 +1,1 @@
+# Taller6-SolarBI-Linea1
