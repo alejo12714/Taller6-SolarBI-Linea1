@@ -19,7 +19,6 @@ groups:
     annotations:
       summary: SoC mínimo de {{ $$labels.inversor }} = {{ $$values.B }} %
       description: Por debajo del umbral ALERTA_SOC_MIN (ConfigMap). Riesgo de corte por batstopsoc.
-      __dashboardUid__: solarbi-operativo
     data:
     - refId: A
       datasourceUid: solarbi-pg
@@ -65,7 +64,6 @@ groups:
     annotations:
       summary: '{{ $$labels.inversor }} lleva {{ $$values.B }} s sin lecturas'
       description: Umbral ≈ 2,7 × p99 de cadencia (111 s); por debajo del umbral de hueco de los autores (600 s).
-      __dashboardUid__: solarbi-operativo
     data:
     - refId: A
       datasourceUid: solarbi-pg
@@ -110,7 +108,6 @@ groups:
     annotations:
       summary: '% de lecturas válidas de {{ $$labels.inversor }} = {{ $$values.B }} %'
       description: Línea base histórica ≈ 98 % (1,94 % de tramas nulas). 90 % ≈ 5 × la tasa normal de inválidos.
-      __dashboardUid__: solarbi-operativo
     data:
     - refId: A
       datasourceUid: solarbi-pg

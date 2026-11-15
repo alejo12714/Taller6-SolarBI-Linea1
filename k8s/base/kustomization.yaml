@@ -23,7 +23,7 @@ configMapGenerator:
       - SQLITE_PATH=/data/opencem-v1.0.0.sqlite
       - CHUNK_ROWS=250000
       - CALCULAR_SHA=1
-      - REPLAY_DESDE=2026-06-01T00:00:00+08:00
+      - REPLAY_DESDE=2026-03-10T08:00:00+08:00
       - REPLAY_DIAS=7
       - DT_MAX_S=120
       - ANOMALIA_PROB=0.05
