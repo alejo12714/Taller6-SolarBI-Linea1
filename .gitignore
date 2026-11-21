@@ -19,3 +19,6 @@ powerbi-db/
 
 # Soporte del dataset ya descomprimido (se regenera desde el .zip; incluye un CSV de 17 MB)
 descargas-SolarBI/opencem-v1.0.0-support/
+
+# Pytest
+.pytest_cache/
